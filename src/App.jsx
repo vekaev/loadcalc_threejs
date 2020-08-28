@@ -48,6 +48,7 @@ const Pallet = (props) => {
     </mesh>
   );
 };
+
 const Container = (props) => {
   const mesh = useRef();
 
@@ -71,41 +72,103 @@ const Container = (props) => {
 
 const App = () => {
   const el = useRef(null);
+  const scene = new THREE.Scene();
 
-  useEffect(() => {
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
+  function changeCanvas(canvas, ctx, color = '#0088ff', firstAxis, secondAxis) {
+    for (let i = 0; i <= secondAxis; i++) {
+      for (let j = 0; j <= firstAxis; j++) {
+        ctx.fillStyle = color;
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#fff';
+        ctx.fillRect(
+          j * (canvas.width / firstAxis),
+          i * (canvas.height / secondAxis),
+          canvas.width,
+          canvas.height,
+        );
 
-    function changeCanvas(color = '#0088ff', xq = 5, yq = 5) {
-      for (let i = 0; i <= yq; i++) {
-        for (let j = 0; j <= xq; j++) {
-          ctx.fillStyle = color;
-          ctx.fillRect(
-            j * (canvas.width / xq),
-            i * (canvas.height / yq),
-            canvas.width,
-            canvas.height,
-          );
-          ctx.lineWidth = 2;
-          ctx.strokeStyle = '#fff';
-          ctx.strokeRect(
-            j * (canvas.width / xq),
-            i * (canvas.height / yq),
-            canvas.width,
-            canvas.height,
-          );
-        }
+        ctx.strokeRect(
+          j * (canvas.width / firstAxis),
+          i * (canvas.height / secondAxis),
+          canvas.width,
+          canvas.height,
+        );
       }
     }
+  }
 
+  const convertCoordinatesCube = (position, size) => {
+    let calc = position + size / 2;
+    return calc;
+  };
+
+  const createCanvasBoxSides = ({ size, complex, position }) => {
+    const convertData = {
+      xw: size.x / 100,
+      yw: size.y / 100,
+      zw: size.z / 100,
+      xq: complex.x,
+      yq: complex.y,
+      zq: complex.z,
+      posX: position.x / 100,
+      posY: position.y / 100,
+      posZ: position.z / 100,
+    };
+
+    const { xw, xq, yw, yq, zw, zq, posX, posY, posZ } = convertData;
+
+    let cubeGeometry = new THREE.BoxGeometry(xw, zw, yw);
+
+    const axisQuantity = [
+      [xq, yq],
+      [xq, zq],
+      [yq, zq],
+    ];
+    let texture = [];
+    let canvas = [];
+    let ctx = [];
+
+    for (let i = 0; i < 3; i++) {
+      canvas[i] = document.createElement(`canvas`);
+      ctx[i] = canvas[i].getContext('2d');
+      ctx[i].imageSmoothingEnabled = false;
+
+      texture[i] = new THREE.Texture(canvas[i]);
+
+      changeCanvas(
+        canvas[i],
+        ctx[i],
+        'red',
+        axisQuantity[i][0],
+        axisQuantity[i][1],
+      );
+      texture[i].needsUpdate = true;
+    }
+
+    var cubeMaterials = [
+      new THREE.MeshBasicMaterial({ map: texture[2] }),
+      new THREE.MeshBasicMaterial({ map: texture[2] }),
+      new THREE.MeshBasicMaterial({ map: texture[0] }),
+      new THREE.MeshBasicMaterial({ map: texture[0] }),
+      new THREE.MeshBasicMaterial({ map: texture[1] }),
+      new THREE.MeshBasicMaterial({ map: texture[1] }),
+    ];
+
+    let cube = new THREE.Mesh(cubeGeometry, cubeMaterials);
+
+    scene.add(cube);
+
+    cube.position.set(
+      convertCoordinatesCube(posX, xw),
+      convertCoordinatesCube(posY, yw),
+      convertCoordinatesCube(posZ, zw),
+    );
+  };
+
+  useEffect(() => {
     const renderer = new THREE.WebGLRenderer();
     //set bcg color
     renderer.setClearColor(0x000000);
-
-    var edgeGeometry = new THREE.BoxBufferGeometry(100, 100, 100);
-    var edges = new THREE.EdgesGeometry(edgeGeometry);
-
-    const scene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(
       //view angle
@@ -117,8 +180,29 @@ const App = () => {
       //distance from
       1000,
     );
+
+    let boxData = {
+      size: {
+        x: 750,
+        y: 990,
+        z: 120,
+      },
+      position: {
+        x: 200,
+        y: 0,
+        z: 880,
+      },
+      complex: {
+        x: 5,
+        y: 3,
+        z: 1,
+      },
+    };
+
+    createCanvasBoxSides(boxData);
+
     //set camera position
-    camera.position.set(5, 5, 10);
+    camera.position.set(15, 15, 30);
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -133,32 +217,27 @@ const App = () => {
 
     el.current.appendChild(renderer.domElement);
 
-    const cubeGeometry = new THREE.BoxGeometry(7.5, 3.3, 1.7);
-
-    var texture = new THREE.Texture(canvas);
-    var cubeMaterials = new THREE.MeshBasicMaterial({ map: texture });
-
-    const cube = new THREE.Mesh(cubeGeometry, cubeMaterials);
-
     var gridHelper = new THREE.GridHelper(200, 16, 0xffffff, 0xffffff);
-    gridHelper.position.y = -1;
+    gridHelper.position.y = 0;
     gridHelper.position.x = 0;
     scene.add(gridHelper);
-    var geometry = new THREE.EdgesGeometry(cube.geometry); // or WireframeGeometry
+    // var geometry = new THREE.EdgesGeometry(cube.geometry); // or WireframeGeometry
     var material = new THREE.LineBasicMaterial({
       color: 0xff00ff,
       linewidth: 8,
       linecap: 'round',
       linejoin: 'round',
     });
-    var edges = new THREE.LineSegments(geometry, material);
-    cube.add(edges);
-    scene.add(cube);
-    changeCanvas();
+    // var edges = new THREE.LineSegments(geometry, material);
+    // cube.add(edges);
+
+    // changeCanvas();
     const animate = () => {
       requestAnimationFrame(animate);
+      // for (let i = 0; i < 3; i++) {
+      //   texture[1].needsUpdate = true;
+      // }
 
-      texture.needsUpdate = true;
       controls.update();
       renderer.render(scene, camera);
     };

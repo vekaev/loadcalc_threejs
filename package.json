@@ -39,8 +39,11 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "canvas": "^2.6.1",
     "dat.gui": "^0.7.7",
     "drei": "^1.1.0",
+    "gl": "^4.5.3",
+    "jsdom": "^16.4.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",
