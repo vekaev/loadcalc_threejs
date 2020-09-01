@@ -145,7 +145,7 @@ const App = () => {
       texture[i].needsUpdate = true;
     }
 
-    var cubeMaterials = [
+    let cubeMaterials = [
       new THREE.MeshBasicMaterial({ map: texture[2] }),
       new THREE.MeshBasicMaterial({ map: texture[2] }),
       new THREE.MeshBasicMaterial({ map: texture[0] }),
@@ -206,23 +206,23 @@ const App = () => {
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    var controls = new OrbitControls(camera);
+    let controls = new OrbitControls(camera);
 
     controls.minZoom = 0.5;
     controls.maxZoom = 2;
 
-    var light = new THREE.AmbientLight(0xffffff, 5.0);
+    let light = new THREE.AmbientLight(0xffffff, 5.0);
 
     scene.add(light);
 
     el.current.appendChild(renderer.domElement);
 
-    var gridHelper = new THREE.GridHelper(200, 16, 0xffffff, 0xffffff);
+    let gridHelper = new THREE.GridHelper(200, 16, 0xffffff, 0xffffff);
     gridHelper.position.y = 0;
     gridHelper.position.x = 0;
     scene.add(gridHelper);
     // var geometry = new THREE.EdgesGeometry(cube.geometry); // or WireframeGeometry
-    var material = new THREE.LineBasicMaterial({
+    let material = new THREE.LineBasicMaterial({
       color: 0xff00ff,
       linewidth: 8,
       linecap: 'round',
