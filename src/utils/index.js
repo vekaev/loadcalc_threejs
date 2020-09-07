@@ -2,19 +2,18 @@ import * as THREE from 'three/build/three.module.js';
 
 const sizeCoefficient = 50;
 
-export const getRandomColor = () => {
+function getRandomColor() {
   let letters = '0123456789ABCDEF';
   let color = '#';
   for (let i = 0; i < 6; i++) color += letters[Math.floor(Math.random() * 16)];
   return color;
-};
+}
 
-const convertCoordinatesCube = (location, size) => {
-  let calc = location + size / 2;
-  return calc;
-};
+function convertCoordinatesCube(location, size) {
+  return location + size / 2;
+}
 
-function wrapText(context, text, x, y, maxWidth, lineHeight) {
+function wrapCanvasBcgText(context, text, x, y, maxWidth, lineHeight) {
   let words = text.split(' ');
   let line = '';
 
@@ -33,7 +32,7 @@ function wrapText(context, text, x, y, maxWidth, lineHeight) {
   context.fillText(line, x, y);
 }
 
-export const createBox = (scene, { size, complex, location, uid }) => {
+function createBox(scene, { size, complex, location, uid }) {
   const color = getRandomColor();
   const createCanvasBcg = (
     canvas,
@@ -100,6 +99,7 @@ export const createBox = (scene, { size, complex, location, uid }) => {
     canvas[i].width = axisWidth[i][0] * sizeCoefficient;
     canvas[i].height = axisWidth[i][1] * sizeCoefficient;
     ctx[i] = canvas[i].getContext('2d');
+    ctx[i].clearRect(0, 0, canvas[i].width, canvas[i].height);
     ctx[i].imageSmoothingEnabled = false;
     texture[i] = new THREE.Texture(canvas[i]);
 
@@ -115,7 +115,7 @@ export const createBox = (scene, { size, complex, location, uid }) => {
     if (maxWidth >= 350 && i === 1) {
       ctx[i].font = '20px Arial';
       ctx[i].fillStyle = '#fff';
-      wrapText(ctx[i], text, 10, 30, maxWidth, 22);
+      wrapCanvasBcgText(ctx[i], text, 10, 30, maxWidth, 22);
     }
     texture[i].needsUpdate = true;
   }
@@ -138,12 +138,9 @@ export const createBox = (scene, { size, complex, location, uid }) => {
     convertCoordinatesCube(posZ, zw),
     convertCoordinatesCube(posY, yw),
   );
-};
+}
 
-export const createCylinder = (
-  scene,
-  { height, radius, complex, location, uid },
-) => {
+function createCylinder(scene, { height, radius, complex, location, uid }) {
   const color = getRandomColor();
 
   const convertData = {
@@ -190,6 +187,7 @@ export const createCylinder = (
   canvas.width = Math.PI * convertRadius * 2 * sizeCoefficient;
   canvas.height = convertHeight * sizeCoefficient;
   const ctx = canvas.getContext('2d');
+
   const texture = new THREE.Texture(canvas);
   texture.needsUpdate = true;
   ctx.imageSmoothingEnabled = false;
@@ -199,7 +197,7 @@ export const createCylinder = (
   let maxWidth = canvas.width - 10;
   ctx.font = '5px Arial';
   ctx.fillStyle = '#fff';
-  wrapText(ctx, text, 5, 8, maxWidth, 32);
+  wrapCanvasBcgText(ctx, text, 5, 8, maxWidth, 32);
   let cylinderMaterials = [
     new THREE.MeshBasicMaterial({ map: texture }),
     new THREE.MeshBasicMaterial({ color: color }),
@@ -215,17 +213,12 @@ export const createCylinder = (
 
   let cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterials);
 
-  // cylinder.position.set(
-  //   convertCoordinatesCube(posX, convertRadius),
-  //   convertCoordinatesCube(posZ, convertRadius),
-  //   convertCoordinatesCube(posY, convertHeight),
-  // );
   cylinder.position.set(posX, posZ + convertHeight / 2, posY);
 
   scene.add(cylinder);
-};
+}
 
-export function showResult(scene, containerObject) {
+export default function createSceneObjects(scene, containerObject, palletView) {
   let palletSize = {
     x: containerObject.size.x / containerObject.complex.x,
     y: containerObject.size.y / containerObject.complex.y,
@@ -233,15 +226,18 @@ export function showResult(scene, containerObject) {
   };
 
   let pallet = containerObject;
-  // if (pallet.type == 'pallet') {
-  //   let data = {
-  //     size: containerObject.size,
-  //     complex: containerObject.complex,
-  //     location: containerObject.location,
-  //     uid: containerObject.uid,
-  //   };
-  //   createBox(scene, data);
-  // }
+  if (palletView) {
+    if (pallet.type == 'pallet') {
+      let data = {
+        size: containerObject.size,
+        complex: containerObject.complex,
+        location: containerObject.location,
+        uid: containerObject.uid,
+      };
+      createBox(scene, data);
+    }
+    return;
+  }
 
   for (let x = 0; x < pallet.complex.x; ++x) {
     for (let y = 0; y < pallet.complex.y; ++y) {
@@ -249,12 +245,7 @@ export function showResult(scene, containerObject) {
         for (let j in pallet.children) {
           let obj = pallet.children[j];
 
-          let boxLocation = {
-            x: obj.location.x + x * palletSize.x,
-            y: obj.location.y + y * palletSize.y,
-            z: obj.location.z + z * palletSize.z,
-          };
-          let rollLocation = {
+          let location = {
             x: obj.location.x + x * palletSize.x,
             y: obj.location.y + y * palletSize.y,
             z: obj.location.z + z * palletSize.z,
@@ -262,11 +253,10 @@ export function showResult(scene, containerObject) {
 
           switch (obj.form) {
             case 'box':
-              console.log(obj.type);
               let boxData = {
                 size: obj.size,
                 complex: obj.complex,
-                location: boxLocation,
+                location: location,
                 uid: obj.uid,
               };
               createBox(scene, boxData);
@@ -277,7 +267,7 @@ export function showResult(scene, containerObject) {
                 height: obj.height,
                 radius: obj.radius,
                 complex: obj.complex,
-                location: rollLocation,
+                location: location,
                 uid: obj.uid,
               };
               createCylinder(scene, rollData);

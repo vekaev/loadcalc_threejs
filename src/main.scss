@@ -10,8 +10,7 @@ canvas {
   height: 100%;
 }
 button {
+  position: relative;
   top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
   line-height: 20px;
 }
