@@ -7,13 +7,6 @@ import createSceneObjects from './utils';
 
 const OrbitControls = require('three-orbit-controls')(THREE);
 
-const defaultParam = {
-  WIDTH: 100,
-  HEIGHT: 100,
-};
-
-const { WIDTH, HEIGHT } = defaultParam;
-
 const App = () => {
   //NEED TO ADD RENDERING STATUS
   const [viewMode, setViewMode] = useState({
@@ -21,8 +14,18 @@ const App = () => {
     rendering: false,
   });
   const renderer = new THREE.WebGLRenderer();
+  renderer.setPixelRatio(window.devicePixelRatio);
   const canvas = useRef(null);
+  const canvasContainer = useRef(null);
   const scene = new THREE.Scene();
+
+  const defaultParam = {
+    WIDTH: window.innerWidth,
+    HEIGHT: window.innerHeight,
+  };
+
+  let { WIDTH, HEIGHT } = defaultParam;
+  console.log(WIDTH);
   const camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 0.5, 1000);
   const controls = new OrbitControls(camera, renderer.domElement);
 
@@ -107,6 +110,8 @@ const App = () => {
   };
 
   useEffect(() => {
+    WIDTH = canvasContainer.current.offsetWidth;
+    HEIGHT = canvasContainer.current.offsetHeight;
     renderer.setClearColor(0xffffff);
     renderer.setSize(WIDTH, HEIGHT);
     camera.position.set(
@@ -144,14 +149,14 @@ const App = () => {
     animate();
 
     window.addEventListener('resize', function () {
-      renderer.setSize(WIDTH, HEIGHT);
-      camera.aspect = WIDTH / HEIGHT;
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
     });
   });
 
   return (
-    <div className='canvas-module'>
+    <div ref={canvasContainer} className='canvas-module'>
       <div className='switcher'>
         <div className='switcher-item'>
           <input
