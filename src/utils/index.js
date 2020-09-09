@@ -44,7 +44,7 @@ function createBox(scene, { size, complex, location, uid }) {
     for (let i = 0; i <= secondAxis; i++) {
       for (let j = 0; j <= firstAxis; j++) {
         ctx.fillStyle = color;
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 3;
         ctx.strokeStyle = '#fff';
         ctx.fillRect(
           j * (canvas.width / firstAxis),
@@ -75,7 +75,6 @@ function createBox(scene, { size, complex, location, uid }) {
     posZ: location.z / sizeCoefficient,
     text: uid,
   };
-
   const { xw, xq, yw, yq, zw, zq, posX, posY, posZ, text } = convertData;
 
   let cubeGeometry = new THREE.BoxGeometry(xw, zw, yw);
