@@ -1,159 +1,36 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import './main.scss';
-import * as THREE from 'three/build/three.module.js';
-import TWEEN from '@tweenjs/tween.js';
 import { responceData } from './responceData';
-import createSceneObjects from './utils';
 
-const OrbitControls = require('three-orbit-controls')(THREE);
+import WebGl from './components/WebGl';
+import TWEEN from '@tweenjs/tween.js';
 
-const App = () => {
+const App = (callback, inputs) => {
   //NEED TO ADD RENDERING STATUS
   const [viewMode, setViewMode] = useState({
     showPallet: false,
     rendering: false,
+    height: 837,
+    width: 1200,
   });
-  const renderer = new THREE.WebGLRenderer();
-  renderer.setPixelRatio(window.devicePixelRatio);
-  const canvas = useRef(null);
+  const childRef = useRef();
   const canvasContainer = useRef(null);
-  const scene = new THREE.Scene();
 
-  const defaultParam = {
-    WIDTH: window.innerWidth,
-    HEIGHT: window.innerHeight,
-  };
-
-  let { WIDTH, HEIGHT } = defaultParam;
-  console.log(WIDTH);
-  const camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 0.5, 1000);
-  const controls = new OrbitControls(camera, renderer.domElement);
-
-  const initialPosition = {
-    x: 20,
-    y: 15,
-    z: 25,
-  };
-
-  function inheritCamera() {
-    let tweenDuration = 1000;
-
-    TWEEN.removeAll();
-
-    let targetNewPos = { x: initialPosition.x, y: initialPosition.y, z: 0 };
-
-    let camTween = new TWEEN.Tween(camera.position)
-      .to(initialPosition, tweenDuration)
-      .easing(TWEEN.Easing.Quadratic.InOut)
-      .start();
-    let targetTween = new TWEEN.Tween(controls.target)
-      .to(targetNewPos, tweenDuration)
-      .easing(TWEEN.Easing.Quadratic.InOut)
-      .start();
-  }
-
-  // function cameraZoom(e) {
-  //   const direction = e.target.name;
-  //   const { x, y, z } = camera.position;
-  //
-  //   function inheritPosition(direction, inherit) {
-  //     console.log(camera.position.z);
-  //     if (camera.position.z > 20 && camera.position.z < 100) {
-  //       switch (direction) {
-  //         case 'zoomIn':
-  //           return inherit > 0
-  //             ? (inherit = inherit - 5)
-  //             : (inherit = inherit + 5);
-  //           break;
-  //         case 'zoomOut':
-  //           return inherit > 0
-  //             ? (inherit = inherit + 5)
-  //             : (inherit = inherit - 5);
-  //           break;
-  //       }
-  //     } else {
-  //       inheritCamera();
-  //     }
-  //   }
-  //
-  //   let zoom = new TWEEN.Tween(camera.position)
-  //     .to(
-  //       {
-  //         x: inheritPosition(direction, x),
-  //         y: inheritPosition(direction, y),
-  //         z: inheritPosition(direction, z),
-  //       },
-  //       500,
-  //     )
-  //     .start();
-  // }
-
-  // function zoomModel(isZoomOut, scale) {
-  //   if (isZoomOut) {
-  //     controls.dollyIn(scale);
-  //   } else {
-  //     controls.dollyOut(scale);
-  //   }
-  //   scope.update();
-  // }
-
-  const changeObjectsView = (command) => {
-    inheritCamera();
-    // clear cash
-    setTimeout(() => {
-      setViewMode({
-        ...viewMode,
-        showPallet: command,
-        rendering: false,
-      });
-    }, 1000);
+  const setCanvasSize = () => {
+    setViewMode({
+      ...viewMode,
+      width: canvasContainer.current.offsetWidth,
+      height: canvasContainer.current.offsetHeight,
+    });
   };
 
   useEffect(() => {
-    WIDTH = canvasContainer.current.offsetWidth;
-    HEIGHT = canvasContainer.current.offsetHeight;
-    renderer.setClearColor(0xffffff);
-    renderer.setSize(WIDTH, HEIGHT);
-    camera.position.set(
-      initialPosition.x,
-      initialPosition.y,
-      initialPosition.z,
-    );
-
-    //SET USER CONTROL AND ZOOM LIMIT
-    const controls = new OrbitControls(camera);
-    controls.maxDistance = 100;
-    // controls.minDistance = 30;
-
-    const light = new THREE.AmbientLight(0xffffff, 5.0);
-
-    const gridHelper = new THREE.GridHelper(400, 20, 0xb6bdc4, 0xb6bdc4);
-    if (canvas.childElementCount?.length > 1) {
-    }
-    canvas.current.innerHTML = '';
-    canvas.current.appendChild(renderer.domElement);
-
-    scene.add(light, gridHelper);
-
-    responceData.forEach((item) => {
-      createSceneObjects(scene, item, viewMode.showPallet);
-    });
-
-    const animate = () => {
-      renderer.setSize(WIDTH, HEIGHT);
-      TWEEN.update();
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
+    setCanvasSize();
+    window.addEventListener('resize', setCanvasSize);
+    return () => {
+      // window.removeEventListener('resize', setCanvasSize);
     };
-    animate();
-
-    window.addEventListener('resize', function () {
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-    });
-  });
+  }, []);
 
   return (
     <div ref={canvasContainer} className='canvas-module'>
@@ -165,6 +42,7 @@ const App = () => {
             name='viewMode'
             defaultChecked={!viewMode.showPallet}
             disabled={viewMode.rendering}
+            value={false}
             onChange={() => {
               changeObjectsView(false);
             }}
@@ -180,6 +58,7 @@ const App = () => {
             name='viewMode'
             defaultChecked={viewMode.showPallet}
             disabled={viewMode.rendering}
+            value={true}
             onChange={() => {
               changeObjectsView(true);
             }}
@@ -189,16 +68,95 @@ const App = () => {
           </label>
         </div>
       </div>
-      <button onClick={inheritCamera}>inheritCamera</button>
-      {/*<button name='zoomIn' onClick={() => zoomModel(false, 4)}>*/}
-      {/*  cameraZoomIn*/}
-      {/*</button>*/}
-      {/*<button name='zoomOut' onClick={() => zoomModel(true, 4)}>*/}
-      {/*  cameraZoomOut*/}
-      {/*</button>*/}
-      <div ref={canvas}></div>
+      <button
+        onClick={() => {
+          childRef.current.inheritCamera();
+        }}
+      >
+        Home
+      </button>
+      <WebGl
+        ref={childRef}
+        // setInheritCamera={}
+        height={viewMode.height}
+        width={viewMode.width}
+        data={responceData}
+        viewPallet={viewMode.showPallet}
+      />
     </div>
   );
 };
 
 export default App;
+
+// {/*<button onClick={inheritCamera}>inheritCamera</button>*/}
+// {/*<button name='zoomIn' onClick={() => zoomModel(false, 4)}>*/}
+// {/*  cameraZoomIn*/}
+// {/*</button>*/}
+// {/*<button name='zoomOut' onClick={() => zoomModel(true, 4)}>*/}
+// {/*  cameraZoomOut*/}
+// {/*</button>*/}
+
+// const defaultParam = {
+//   WIDTH:
+//     canvasContainer.current?.offsetWidth || window.innerWidth >= 1200
+//       ? 1200
+//       : window.innerWidth,
+//   HEIGHT: canvasContainer.current?.offsetHeight || 500,
+// };
+
+// function cameraZoom(e) {
+//   const direction = e.target.name;
+//   const { x, y, z } = camera.position;
+//
+//   function inheritPosition(direction, inherit) {
+//     console.log(camera.position.z);
+//     if (camera.position.z > 20 && camera.position.z < 100) {
+//       switch (direction) {
+//         case 'zoomIn':
+//           return inherit > 0
+//             ? (inherit = inherit - 5)
+//             : (inherit = inherit + 5);
+//           break;
+//         case 'zoomOut':
+//           return inherit > 0
+//             ? (inherit = inherit + 5)
+//             : (inherit = inherit - 5);
+//           break;
+//       }
+//     } else {
+//       inheritCamera();
+//     }
+//   }
+//
+//   let zoom = new TWEEN.Tween(camera.position)
+//     .to(
+//       {
+//         x: inheritPosition(direction, x),
+//         y: inheritPosition(direction, y),
+//         z: inheritPosition(direction, z),
+//       },
+//       500,
+//     )
+//     .start();
+// }
+
+// function zoomModel(isZoomOut, scale) {
+//   if (isZoomOut) {
+//     controls.dollyIn(scale);
+//   } else {
+//     controls.dollyOut(scale);
+//   }
+//   scope.update();
+// }
+// const changeObjectsView = (command) => {
+//   inheritCamera(camera, controls);
+//   // clear cash
+//   setTimeout(() => {
+//     setViewMode({
+//       ...viewMode,
+//       showPallet: command,
+//       rendering: false,
+//     });
+//   }, 1000);
+// };

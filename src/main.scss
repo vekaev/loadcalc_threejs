@@ -6,8 +6,9 @@ div {
   line-height: 0;
 }
 canvas {
-  max-width: 100%;
+  width: 100%;
   height: 100%;
+  display: block;
 }
 button {
   position: relative;
@@ -15,8 +16,9 @@ button {
   line-height: 20px;
 }
 .canvas-module {
+  width: 100%;
   max-width: 1200px;
-  min-height: 500px;
+  min-height: 837px;
 }
 .switcher {
   position: absolute;

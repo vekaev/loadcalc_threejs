@@ -1,6 +1,6 @@
 import * as THREE from 'three/build/three.module.js';
 
-const sizeCoefficient = 50;
+const sizeCoefficient = 30;
 
 function getRandomColor() {
   let letters = '0123456789ABCDEF';
