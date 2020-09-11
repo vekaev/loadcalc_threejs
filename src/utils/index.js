@@ -44,7 +44,7 @@ function createBox(scene, { size, complex, location, uid }) {
     for (let i = 0; i <= secondAxis; i++) {
       for (let j = 0; j <= firstAxis; j++) {
         ctx.fillStyle = color;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
         ctx.strokeStyle = '#fff';
         ctx.fillRect(
           j * (canvas.width / firstAxis),

@@ -12,6 +12,7 @@ const App = (callback, inputs) => {
     rendering: false,
     height: 837,
     width: 1200,
+    showCanvas: false,
   });
   const childRef = useRef();
   const canvasContainer = useRef(null);
@@ -21,7 +22,19 @@ const App = (callback, inputs) => {
       ...viewMode,
       width: canvasContainer.current.offsetWidth,
       height: canvasContainer.current.offsetHeight,
+      showCanvas: true,
     });
+  };
+  const changeObjectsView = (command) => {
+    childRef.current.inheritCamera();
+
+    setTimeout(() => {
+      setViewMode({
+        ...viewMode,
+        showPallet: command,
+        rendering: false,
+      });
+    }, 1000);
   };
 
   useEffect(() => {
@@ -33,56 +46,77 @@ const App = (callback, inputs) => {
   }, []);
 
   return (
-    <div ref={canvasContainer} className='canvas-module'>
-      <div className='switcher'>
-        <div className='switcher-item'>
-          <input
-            type='radio'
-            id='radioBtnCargo'
-            name='viewMode'
-            defaultChecked={!viewMode.showPallet}
-            disabled={viewMode.rendering}
-            value={false}
-            onChange={() => {
-              changeObjectsView(false);
-            }}
-          />
-          <label htmlFor='radioBtnCargo'>
-            <span className='switcher-item__icon'></span>Cargo
-          </label>
+    <div ref={canvasContainer} className='canvas'>
+      <div className='canvas__main'>
+        <div
+          className={`switcher ${
+            viewMode.showPallet ? 'switcher__left' : 'switcher__right'
+          }`}
+        >
+          <div
+            className={`switcher-item ${!viewMode.showPallet ? 'active' : ''}`}
+          >
+            <input
+              type='radio'
+              id='radioBtnCargo'
+              name='viewMode'
+              defaultChecked={!viewMode.showPallet}
+              disabled={viewMode.rendering}
+              value={false}
+              onChange={() => {
+                changeObjectsView(false);
+              }}
+            />
+            <label htmlFor='radioBtnCargo'>
+              <span className='switcher-item__icon'></span>Cargo
+            </label>
+          </div>
+          <div
+            className={`switcher-item ${viewMode.showPallet ? 'active' : ''}`}
+          >
+            <input
+              type='radio'
+              id='radioBtnPallets'
+              name='viewMode'
+              defaultChecked={viewMode.showPallet}
+              disabled={viewMode.rendering}
+              value={true}
+              onChange={() => {
+                changeObjectsView(true);
+              }}
+            />
+            <label htmlFor='radioBtnPallets'>
+              <span className='switcher-item__icon'></span>Pallets
+            </label>
+          </div>
         </div>
-        <div className='switcher-item'>
-          <input
-            type='radio'
-            id='radioBtnPallets'
-            name='viewMode'
-            defaultChecked={viewMode.showPallet}
-            disabled={viewMode.rendering}
-            value={true}
-            onChange={() => {
-              changeObjectsView(true);
-            }}
+        {/*<div className='btn-list'>*/}
+        {/*  <button*/}
+        {/*    className='btn__inherit'*/}
+        {/*    onClick={() => {*/}
+        {/*      childRef.current.inheritCamera();*/}
+        {/*    }}*/}
+        {/*  ></button>*/}
+        {/*</div>*/}
+
+        {/*<button*/}
+        {/*  onClick={() => {*/}
+        {/*    childRef.current.zoom(10);*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  zoom*/}
+        {/*</button>*/}
+        {viewMode.showCanvas && (
+          <WebGl
+            ref={childRef}
+            // setInheritCamera={}
+            height={viewMode.height}
+            width={viewMode.width}
+            data={responceData}
+            viewPallet={viewMode.showPallet}
           />
-          <label htmlFor='radioBtnPallets'>
-            <span className='switcher-item__icon'></span>Pallets
-          </label>
-        </div>
+        )}
       </div>
-      <button
-        onClick={() => {
-          childRef.current.inheritCamera();
-        }}
-      >
-        Home
-      </button>
-      <WebGl
-        ref={childRef}
-        // setInheritCamera={}
-        height={viewMode.height}
-        width={viewMode.width}
-        data={responceData}
-        viewPallet={viewMode.showPallet}
-      />
     </div>
   );
 };
@@ -149,14 +183,3 @@ export default App;
 //   }
 //   scope.update();
 // }
-// const changeObjectsView = (command) => {
-//   inheritCamera(camera, controls);
-//   // clear cash
-//   setTimeout(() => {
-//     setViewMode({
-//       ...viewMode,
-//       showPallet: command,
-//       rendering: false,
-//     });
-//   }, 1000);
-// };
