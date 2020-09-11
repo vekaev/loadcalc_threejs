@@ -4,18 +4,25 @@ import { responceData } from './responceData';
 
 import WebGl from './components/WebGl';
 import TWEEN from '@tweenjs/tween.js';
+import Switcher from './components/Switcher';
 
 const App = (callback, inputs) => {
   //NEED TO ADD RENDERING STATUS
   const [viewMode, setViewMode] = useState({
+    cargoRendering: 'cargo',
     showPallet: false,
-    rendering: false,
+    loading: false,
     height: 837,
     width: 1200,
     showCanvas: false,
   });
+
   const childRef = useRef();
   const canvasContainer = useRef(null);
+
+  const stopLoading = () => {
+    setViewMode({ ...viewMode, loading: false });
+  };
 
   const setCanvasSize = () => {
     setViewMode({
@@ -26,13 +33,20 @@ const App = (callback, inputs) => {
     });
   };
   const changeObjectsView = (command) => {
+    // setViewMode({
+    //   ...viewMode,
+    //   loading: true,
+    //   cargoRendering: command,
+    // });
+    //
     childRef.current.inheritCamera();
 
     setTimeout(() => {
       setViewMode({
         ...viewMode,
-        showPallet: command,
-        rendering: false,
+        cargoRendering: command,
+        showPallet: command == 'pallet',
+        loading: false,
       });
     }, 1000);
   };
@@ -45,51 +59,11 @@ const App = (callback, inputs) => {
     };
   }, []);
 
+  console.log('main rerender');
   return (
     <div ref={canvasContainer} className='canvas'>
       <div className='canvas__main'>
-        <div
-          className={`switcher ${
-            viewMode.showPallet ? 'switcher__left' : 'switcher__right'
-          }`}
-        >
-          <div
-            className={`switcher-item ${!viewMode.showPallet ? 'active' : ''}`}
-          >
-            <input
-              type='radio'
-              id='radioBtnCargo'
-              name='viewMode'
-              defaultChecked={!viewMode.showPallet}
-              disabled={viewMode.rendering}
-              value={false}
-              onChange={() => {
-                changeObjectsView(false);
-              }}
-            />
-            <label htmlFor='radioBtnCargo'>
-              <span className='switcher-item__icon'></span>Cargo
-            </label>
-          </div>
-          <div
-            className={`switcher-item ${viewMode.showPallet ? 'active' : ''}`}
-          >
-            <input
-              type='radio'
-              id='radioBtnPallets'
-              name='viewMode'
-              defaultChecked={viewMode.showPallet}
-              disabled={viewMode.rendering}
-              value={true}
-              onChange={() => {
-                changeObjectsView(true);
-              }}
-            />
-            <label htmlFor='radioBtnPallets'>
-              <span className='switcher-item__icon'></span>Pallets
-            </label>
-          </div>
-        </div>
+        <Switcher changeObjectsView={changeObjectsView} />
         {/*<div className='btn-list'>*/}
         {/*  <button*/}
         {/*    className='btn__inherit'*/}
@@ -109,7 +83,7 @@ const App = (callback, inputs) => {
         {viewMode.showCanvas && (
           <WebGl
             ref={childRef}
-            // setInheritCamera={}
+            stopLoading={stopLoading}
             height={viewMode.height}
             width={viewMode.width}
             data={responceData}

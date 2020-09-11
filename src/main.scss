@@ -45,18 +45,21 @@ button {
   }
   &:after {
     width: 50%;
-    background: #0088ff;
+    //background: #0088ff;
     transform: translateX(0);
     transition: 0.2s ease;
   }
-  &__active {
+  &__cargo {
     &:after {
-      transition: 0.2s ease;
-      width: 50%;
       transform: translateX(100%);
-      background: #0088ff;
     }
   }
+  &__pallet {
+    &:after {
+      transform: translateX(100%);
+    }
+  }
+
   &-item {
     width: 50%;
     text-align: center;
