@@ -1,45 +1,85 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function Switcher({ changeObjectsView }) {
-  const [renderStatus, setRenderStatus] = useState('cargo');
+  const [renderStatus, setRenderStatus] = useState({
+    status: 'cargo',
+    disabled: false,
+  });
+  const { status, disabled } = renderStatus;
+
+  let timerId;
 
   const handleChange = (e) => {
-    setRenderStatus(e.target.value);
-    changeObjectsView(e.target.value);
+    let newValue = e.target.value;
+
+    setRenderStatus({
+      ...renderStatus,
+      status: newValue,
+      disabled: true,
+    });
+
+    changeObjectsView(newValue);
+
+    timerId = setTimeout(() => {
+      setRenderStatus({
+        ...renderStatus,
+        status: newValue,
+        disabled: false,
+      });
+    }, 1500);
   };
 
+  useEffect(() => {
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, []);
+
   return (
-    <div className={`switcher ${renderStatus}`}>
+    <div
+      className={`switcher 
+                  switcher__${status} 
+                  ${disabled && 'switcher__disabled'}`}
+    >
       <div
-        className={`switcher-item ${renderStatus == 'cargo' ? 'active' : ''}`}
+        className={`switcher-item 
+                    switcher-item__cargo
+                    ${status == 'cargo' && 'active'}`}
       >
         <input
           type='radio'
           id='radioBtnCargo'
           name='viewMode'
-          defaultChecked={renderStatus == 'cargo'}
-          // disabled={viewMode.loading}
+          defaultChecked={status === 'cargo'}
+          disabled={disabled}
+          onBlur={() => {
+            console.log('blur');
+          }}
           value={'cargo'}
           onChange={handleChange}
         />
         <label htmlFor='radioBtnCargo'>
-          <span className='switcher-item__icon'></span>Cargo
+          <span className='label-icon'></span>
+          <p>Cargo</p>
         </label>
       </div>
       <div
-        className={`switcher-item ${renderStatus == 'pallet' ? 'active' : ''}`}
+        className={`switcher-item 
+                    switcher-item__pallet
+                    ${status === 'pallet' && 'active'}`}
       >
         <input
           type='radio'
           id='radioBtnPallets'
           name='viewMode'
-          defaultChecked={renderStatus == 'pallet'}
-          // disabled={viewMode.loading}
+          defaultChecked={status === 'pallet'}
+          disabled={disabled}
           value={'pallet'}
           onChange={handleChange}
         />
         <label htmlFor='radioBtnPallets'>
-          <span className='switcher-item__icon'></span>Pallets
+          <span className='label-icon'></span>
+          <p>Pallets</p>
         </label>
       </div>
     </div>

@@ -1,4 +1,6 @@
 const playwright = require('playwright');
+const argv = require('yargs').argv;
+
 
 
 const htmlContent = `
@@ -124,7 +126,7 @@ const htmlContent = `
                   size: {
                     x: 750,
                     y: 990,
-                    z: 120,
+                    z: ${argv.size},
                   },
                   position: {
                     x: 200,
@@ -168,5 +170,4 @@ const htmlContent = `
   await page.setContent(htmlContent, { waitUntil: 'networkidle' });
   await page.screenshot({ path: `example.png` });
   await browser.close();
-  console.timeEnd('time')
 })();

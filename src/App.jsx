@@ -9,9 +9,7 @@ import Switcher from './components/Switcher';
 const App = (callback, inputs) => {
   //NEED TO ADD RENDERING STATUS
   const [viewMode, setViewMode] = useState({
-    cargoRendering: 'cargo',
     showPallet: false,
-    loading: false,
     height: 837,
     width: 1200,
     showCanvas: false,
@@ -19,10 +17,6 @@ const App = (callback, inputs) => {
 
   const childRef = useRef();
   const canvasContainer = useRef(null);
-
-  const stopLoading = () => {
-    setViewMode({ ...viewMode, loading: false });
-  };
 
   const setCanvasSize = () => {
     setViewMode({
@@ -33,20 +27,12 @@ const App = (callback, inputs) => {
     });
   };
   const changeObjectsView = (command) => {
-    // setViewMode({
-    //   ...viewMode,
-    //   loading: true,
-    //   cargoRendering: command,
-    // });
-    //
     childRef.current.inheritCamera();
 
     setTimeout(() => {
       setViewMode({
         ...viewMode,
-        cargoRendering: command,
-        showPallet: command == 'pallet',
-        loading: false,
+        showPallet: command === 'pallet',
       });
     }, 1000);
   };
@@ -59,19 +45,18 @@ const App = (callback, inputs) => {
     };
   }, []);
 
-  console.log('main rerender');
   return (
     <div ref={canvasContainer} className='canvas'>
       <div className='canvas__main'>
         <Switcher changeObjectsView={changeObjectsView} />
-        {/*<div className='btn-list'>*/}
-        {/*  <button*/}
-        {/*    className='btn__inherit'*/}
-        {/*    onClick={() => {*/}
-        {/*      childRef.current.inheritCamera();*/}
-        {/*    }}*/}
-        {/*  ></button>*/}
-        {/*</div>*/}
+        <div className='btn-list'>
+          <button
+            className='btn__inherit'
+            onClick={() => {
+              childRef.current.inheritCamera();
+            }}
+          ></button>
+        </div>
 
         {/*<button*/}
         {/*  onClick={() => {*/}
@@ -83,7 +68,6 @@ const App = (callback, inputs) => {
         {viewMode.showCanvas && (
           <WebGl
             ref={childRef}
-            stopLoading={stopLoading}
             height={viewMode.height}
             width={viewMode.width}
             data={responceData}

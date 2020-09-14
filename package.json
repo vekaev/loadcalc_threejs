@@ -60,6 +60,7 @@
     "three-orbit-controls": "^82.1.0",
     "three-png-stream": "^1.0.3",
     "three-software-renderer": "^1.2.0",
-    "use-cannon": "^0.5.0"
+    "use-cannon": "^0.5.0",
+    "yargs": "^16.0.3"
   }
 }
