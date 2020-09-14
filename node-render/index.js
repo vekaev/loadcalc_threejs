@@ -1,7 +1,30 @@
 const playwright = require('playwright');
 const argv = require('yargs').argv;
+const commander = require('commander'); // include commander in git clone of commander repo
+const { option } = require('yargs');
+const program = new commander.Command();
 
 
+program
+.option('-f, --json-file-link <dir>' , 'json file')
+.option('-s , --json-data-string <JSON>', 'json data-string')
+.option('-o , --img-save-dir <dir>', 'image save to directory')
+.option('-w , --img-width <size>', 'image width')
+.option('-h , --img-height <size>', 'image height')
+.option('-i , --save-to-img', 'save to .jpg')
+.option('-p , --save-to-png', 'save to .png')
+.parse(process.argv);
+
+
+const { jsonFileLink, 
+        jsonDataString, 
+        imgSaveDir, 
+        imgWidth,
+        imgHeight,
+        saveToImg,
+        saveToPng
+      } = program
+console.log(saveToPng);
 
 const htmlContent = `
   <!doctype html>
@@ -126,7 +149,7 @@ const htmlContent = `
                   size: {
                     x: 750,
                     y: 990,
-                    z: ${argv.size},
+                    z: 120,
                   },
                   position: {
                     x: 200,
