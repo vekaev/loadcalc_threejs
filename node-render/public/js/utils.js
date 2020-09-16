@@ -1,7 +1,3 @@
-import * as THREE from 'three/build/three.module.js';
-
-
-
 const sizeCoefficient = 30;
 
 function getRandomColor() {
@@ -220,7 +216,7 @@ function createCylinder(scene, { height, radius, complex, location, uid }) {
   scene.add(cylinder);
 }
 
-export default function createSceneObjects(scene, containerObject, palletView) {
+window.createSceneObjects = function createSceneObjects(scene, containerObject, palletView) {
   let palletSize = {
     x: containerObject.size.x / containerObject.complex.x,
     y: containerObject.size.y / containerObject.complex.y,
