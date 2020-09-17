@@ -1,7 +1,5 @@
 import * as THREE from 'three/build/three.module.js';
 
-
-
 const sizeCoefficient = 30;
 
 function getRandomColor() {
