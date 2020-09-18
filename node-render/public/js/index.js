@@ -24,12 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let renderer = new THREE.WebGLRenderer();
   renderer.setSize(WIDTH, HEIGHT);
-
+  let zoomCoefficient = 5
   const camera = new THREE.OrthographicCamera(
-      WIDTH / - 100 + (zoomIn * 10),
-      WIDTH / 100 + (zoomIn * 10),
-      HEIGHT / 100 + (zoomIn * 10),
-      HEIGHT / - 100 + (zoomIn * 10),
+      WIDTH / (- 100 - (zoomIn * zoomCoefficient)),
+      WIDTH / (100 + (zoomIn * zoomCoefficient)),
+      HEIGHT / (100 + (zoomIn * zoomCoefficient)),
+      HEIGHT / (- 100 - (zoomIn * zoomCoefficient)),
       1,
       1000 );
 
