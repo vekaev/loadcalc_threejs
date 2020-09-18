@@ -1,4 +1,4 @@
-export const responceData = {
+var responceData = {
   uid: '23d0a9c9-f339-41f5-b3c4-c0581de37d33',
   meta: '91b8cbbf-9cc5-41c7-85b7-6cbde5411b19',
   type: 'container',

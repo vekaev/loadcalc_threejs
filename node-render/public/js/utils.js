@@ -1,4 +1,5 @@
-const sizeCoefficient = 30;
+
+const sizeCoefficient = 50;
 
 function getRandomColor() {
   let letters = '0123456789ABCDEF';
@@ -216,7 +217,12 @@ function createCylinder(scene, { height, radius, complex, location, uid }) {
   scene.add(cylinder);
 }
 
-window.createSceneObjects = function createSceneObjects(scene, containerObject, palletView) {
+window.createSceneObjects =  function createSceneObjects(
+  scene,
+  containerObject,
+  palletView,
+  sizeCoefficient,
+) {
   let palletSize = {
     x: containerObject.size.x / containerObject.complex.x,
     y: containerObject.size.y / containerObject.complex.y,

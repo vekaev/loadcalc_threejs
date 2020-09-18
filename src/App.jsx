@@ -1,19 +1,18 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './main.scss';
 import { responceData } from './responceData';
-
 import WebGl from './components/WebGl';
-import TWEEN from '@tweenjs/tween.js';
 import Switcher from './components/Switcher';
 
-const App = (callback, inputs) => {
-  //NEED TO ADD RENDERING STATUS
+const App = () => {
   const [viewMode, setViewMode] = useState({
     showPallet: false,
     height: 837,
     width: 1200,
     showCanvas: false,
   });
+
+  const { showPallet, height, width, showCanvas } = viewMode;
 
   const childRef = useRef();
   const canvasContainer = useRef(null);
@@ -26,6 +25,7 @@ const App = (callback, inputs) => {
       showCanvas: true,
     });
   };
+
   const changeObjectsView = (command) => {
     childRef.current.inheritCamera();
 
@@ -65,13 +65,13 @@ const App = (callback, inputs) => {
         {/*>*/}
         {/*  zoom*/}
         {/*</button>*/}
-        {viewMode.showCanvas && (
+        {showCanvas && (
           <WebGl
             ref={childRef}
-            height={viewMode.height}
-            width={viewMode.width}
-            data={responceData}
-            viewPallet={viewMode.showPallet}
+            height={height}
+            width={width}
+            responceData={responceData}
+            viewPallet={showPallet}
           />
         )}
       </div>
