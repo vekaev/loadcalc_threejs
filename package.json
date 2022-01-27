@@ -57,7 +57,7 @@
     "react-three-gui": "^0.2.0",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
-    "three": "^0.119.1",
+    "three": "^0.137.0",
     "three-orbit-controls": "^82.1.0",
     "three-png-stream": "^1.0.3",
     "three-software-renderer": "^1.2.0",
